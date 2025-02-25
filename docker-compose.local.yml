@@ -1,0 +1,51 @@
+version: '3'
+
+services:
+  db_recipes:
+    restart: always
+    image: postgres:16-alpine
+    platform: linux/arm64  # Specify platform for Apple Silicon
+    volumes:
+      - ./postgresql:/var/lib/postgresql/data
+    env_file:
+      - ./.env
+
+  web_recipes:
+    restart: always
+    build:
+      context: .
+      dockerfile: Dockerfile
+    platform: linux/arm64  # Specify platform for Apple Silicon
+    env_file:
+      - ./.env
+    environment:
+      - DEBUG=1  # Enable debug mode for local development
+    volumes:
+      - staticfiles:/opt/recipes/staticfiles
+      - nginx_config:/opt/recipes/nginx/conf.d
+      - ./mediafiles:/opt/recipes/mediafiles
+      # For local development, you might want to mount the code for live editing
+      # - .:/opt/recipes
+    depends_on:
+      - db_recipes
+    ports:
+      - "8080:8080"  # Expose the app directly for local development
+
+  nginx_recipes:
+    image: nginx:mainline-alpine
+    platform: linux/arm64  # Specify platform for Apple Silicon
+    restart: always
+    ports:
+      - "8000:80"  # Map to port 8000 on host to avoid conflicts
+    env_file:
+      - ./.env
+    depends_on:
+      - web_recipes
+    volumes:
+      - nginx_config:/etc/nginx/conf.d:ro
+      - staticfiles:/static:ro
+      - ./mediafiles:/media:ro
+
+volumes:
+  nginx_config:
+  staticfiles:
