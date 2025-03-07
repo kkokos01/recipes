@@ -17,9 +17,6 @@ services:
       # Do not make this a bind mount, see https://docs.tandoor.dev/install/docker/#volumes-vs-bind-mounts
       - nginx_config:/opt/recipes/nginx/conf.d
       - ./mediafiles:/opt/recipes/mediafiles
-      # Mount local code directory for development
-      - ./recipes:/opt/recipes/recipes
-      - ./cookbook:/opt/recipes/cookbook
     depends_on:
       - db_recipes
 

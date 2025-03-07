@@ -1,3 +1,4 @@
+import re
 from django.urls import reverse
 from django_scopes import scope, scopes_disabled
 from oauth2_provider.contrib.rest_framework import OAuth2Authentication
@@ -13,6 +14,11 @@ class ScopeMiddleware:
 
     def __call__(self, request):
         prefix = settings.JS_REVERSE_SCRIPT_PREFIX or ''
+
+        # Bypass space checks for OAuth authorization requests
+        if request.path.startswith(prefix + '/o/authorize/') or request.path.startswith(prefix + '/o/token/'):
+            with scopes_disabled():
+                return self.get_response(request)
 
         # need to disable scopes for writing requests into userpref and enable for loading ?
         if request.path.startswith(prefix + '/api/user-preference/'):

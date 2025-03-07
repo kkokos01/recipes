@@ -63,6 +63,11 @@ LOGGING = {
             'handlers': ['console'],
             'level': LOG_LEVEL,
         },
+        'oauth2_provider': {
+            'handlers': ['console'],
+            'level': 'DEBUG',
+            'propagate': True,
+        },
     },
 }
 
@@ -327,7 +332,13 @@ AUTH_PASSWORD_VALIDATORS = [
 
 SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 
-OAUTH2_PROVIDER = {'SCOPES': {'read': 'Read scope', 'write': 'Write scope', 'bookmarklet': 'only access to bookmarklet'}}
+OAUTH2_PROVIDER = {
+    'SCOPES': {'read': 'Read scope', 'write': 'Write scope', 'bookmarklet': 'only access to bookmarklet'},
+    'PKCE_REQUIRED': True,  # Enforce PKCE for added security
+    'ERROR_RESPONSE_WITH_SCOPES': True,  # Include scopes in error responses
+    'ACCESS_TOKEN_EXPIRE_SECONDS': 3600,  # 1 hour
+    'REFRESH_TOKEN_EXPIRE_SECONDS': 86400,  # 1 day
+}
 READ_SCOPE = 'read'
 WRITE_SCOPE = 'write'
 
